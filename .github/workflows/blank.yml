@@ -39,7 +39,7 @@ jobs:
         uses: CrowdStrike/fcs-action@v1.0.6
         with:
           falcon_client_id: 'c029707ea9b747e295fc99a1040479c2'
-          falcon_region: 'us-1'
+          falcon_region: 'us-2'
           path: './'
         env:
           FALCON_CLIENT_SECRET: ${{ secrets.FALCON_CLIENT_SECRET }}
