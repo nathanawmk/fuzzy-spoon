@@ -1,0 +1,3 @@
+name: CrowdStrike FCS CLI GitHub Action
+uses: CrowdStrike/fcs-action@v1.0.6
+            
