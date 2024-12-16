@@ -1,0 +1,164 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Setup script to enable CrowdStrike Falcon CSPM.",
+  "Parameters": {
+    "RoleName": {
+      "Description": "Read-only role for CrowdStrike Falcon CSPM",
+      "Type": "String",
+      "MinLength": "1"
+    },
+    "ExternalID": {
+      "Description": "External ID for created role",
+      "Type": "String",
+      "MinLength": "2"
+    },
+    "CSRoleName": {
+      "Description": "Name of Crowdstrike assuming role",
+      "Type": "String",
+      "MinLength": "10"
+    },
+    "CSAccountNumber": {
+      "Description": "Crowdstrike account number",
+      "Type": "String",
+      "MinLength": "12",
+      "MaxLength": "12"
+    },
+    "PermissionsBoundary": {
+      "Type": "String",
+      "Description": "The name of the policy used to set the permissions boundary for IAM roles",
+      "Default": ""
+    },
+    "EnableIOA": {
+      "Type": "String",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Default": "true"
+    },
+    "EnableIdentityProtection": {
+      "Type": "String",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Default": "false"
+    },
+    "UseExistingCloudtrail": {
+      "Description": "When set to false, a CloudTrail resource is created which allows Horizon to consume non-mutating API events",
+      "Type": "String",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Default": "true"
+    },
+    "CSBucketName": {
+      "Type": "String",
+      "Default": "none"
+    }
+  },
+  "Conditions": {
+    "SetPermissionsBoundary": {
+      "Fn::Not": [{
+        "Fn::Equals" : [ {"Ref": "PermissionsBoundary"}, "" ]
+      }]
+    },
+    "ShouldCreateIOAResources": {
+      "Fn::Or": [
+        {
+          "Fn::Equals": [
+            true,
+            {
+              "Ref": "EnableIdentityProtection"
+            }
+           ]
+        },
+        {
+          "Fn::Equals": [
+            true,
+            {
+              "Ref": "EnableIOA"
+            }
+          ]
+        }
+      ]
+    },
+    "ShouldCreateIOACloudTrailResource": {
+      "Fn::And": [
+        {
+          "Condition": "ShouldCreateIOAResources"
+        },
+        {
+          "Fn::Equals": [
+            false,
+            {
+              "Ref": "UseExistingCloudtrail"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "Resources": {
+    "CrowdStrikeEventBridgeRole": {
+      "Type": "AWS::IAM::Role",
+      "Condition": "ShouldCreateIOAResources",
+      "Properties": {
+        "RoleName": "CrowdStrikeCSPMEventBridge",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Effect": "Allow",
+              "Sid": ""
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "eventbridge-put-events",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": [
+                    "events:PutEvents"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:aws:events:*:*:event-bus/cs-*"
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ],
+        "PermissionsBoundary": { 
+          "Fn::If": [ 
+            "SetPermissionsBoundary", 
+            {"Fn::Sub": "arn:aws:iam::${AWS::AccountId}:policy/${PermissionsBoundary}"}, 
+            {"Ref": "AWS::NoValue"}
+          ]
+        }
+      }
+    },
+    "CrowdStrikeCloudTrail": {
+      "Type": "AWS::CloudTrail::Trail",
+      "Condition": "ShouldCreateIOACloudTrailResource",
+      "Properties": {
+        "TrailName": "crowdstrike-cloudtrail",
+        "S3BucketName": {
+          "Ref": "CSBucketName"
+        },
+        "IncludeGlobalServiceEvents": true,
+        "IsLogging": true,
+        "IsMultiRegionTrail": true
+      }
+    }
+  }
+}
