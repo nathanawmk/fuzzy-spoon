@@ -34,18 +34,6 @@ jobs:
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
-          
-      - name: CrowdStrike FCS CLI GitHub Action
-        uses: CrowdStrike/fcs-action@v1.0.6
-        with:
-          falcon_client_id: 'c029707ea9b747e295fc99a1040479c2'
-          falcon_region: 'us-2'
-          path: './'
-          upload_results: true
-          project_owners: 'nathan.aw@crowdstrike.com'
-          fail_on: "high=2,medium=50"
-        env:
-          FALCON_CLIENT_SECRET: ${{ secrets.FALCON_CLIENT_SECRET }}
 
       - name: Scan Container Image
         uses: actions/checkout@v2
