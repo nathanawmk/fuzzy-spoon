@@ -56,6 +56,6 @@ jobs:
           FALCON_CLIENT_ID: "${{ secrets.FALCON_CLIENT_ID }}"
           FALCON_CLIENT_SECRET: "${{ secrets.FALCON_CLIENT_SECRET }}"
           FALCON_CLOUD_REGION: "{{ secrets.FALCON_CLOUD_REGION }}"
-          CONTAINER_REPO: "{{ secrets.CONTAINER_REPO }}"
+          CONTAINER_REPO: docker.io/library/nginx
           CONTAINER_TAG: "{{ secrets.CONTAINER_TAG }}"
             
