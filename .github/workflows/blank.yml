@@ -41,6 +41,18 @@ jobs:
           username: "${{ secrets.DOCKER_USERNAME }}"
           password: "${{ secrets.DOCKER_PASSWORD }}"
 
+      - name: CrowdStrike FCS CLI GitHub Action
+        uses: CrowdStrike/fcs-action@v1.0.6
+        with:
+          falcon_client_id: "${{ secrets.FALCON_CLIENT_ID }}"
+          falcon_region: 'us-1'
+          path: './'
+          upload_results: true
+          project_owners: 'nathan.aw@crowdstrike.com'
+          fail_on: "high=2,medium=50"
+        env:
+          FALCON_CLIENT_SECRET: ${{ secrets.FALCON_CLIENT_SECRET }}
+          
       - name: Scan Container Image
         uses: actions/checkout@v2
 
