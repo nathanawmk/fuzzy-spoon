@@ -48,10 +48,6 @@ jobs:
           FALCON_CLIENT_SECRET: ${{ secrets.FALCON_CLIENT_SECRET }}
 
       - name: Scan Container Image
-  scan:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
         uses: actions/checkout@v2
 
       - name: CrowdStrike Container Image Scan
