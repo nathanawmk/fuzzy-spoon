@@ -51,5 +51,4 @@ jobs:
           FALCON_CLIENT_SECRET: "${{ secrets.FALCON_CLIENT_SECRET }}"
           CONTAINER_REPO: docker.io/library/busybox
           CONTAINER_TAG: "{{ secrets.CONTAINER_TAG }}"
-          FALCON_CLOUD_REGION: us-2
-            
+          FALCON_CLOUD_REGION: "us-2"
