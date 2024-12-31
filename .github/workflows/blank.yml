@@ -52,3 +52,4 @@ jobs:
           CONTAINER_REPO: docker.io/library/busybox
           CONTAINER_TAG: "{{ secrets.CONTAINER_TAG }}"
           FALCON_CLOUD_REGION: "us-2"
+          crowdstrike_region: "us-2"
